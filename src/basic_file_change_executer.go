@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 )
@@ -17,6 +18,7 @@ func (b *BasicFileChangeExecuter) ExecuteFileChanges(changes []FileChange) error
 			if err != nil {
 				return err
 			}
+			fmt.Println("Edited file:", change.FilePath)
 		case CREATE:
 			dir := filepath.Dir(change.FilePath)
 			if dir != "." {
@@ -29,11 +31,15 @@ func (b *BasicFileChangeExecuter) ExecuteFileChanges(changes []FileChange) error
 			if err != nil {
 				return err
 			}
+			fmt.Println("Created file:", change.FilePath)
 		case DELETE:
 			err := DeleteFile(change.FilePath)
 			if err != nil {
 				return err
 			}
+			fmt.Println("Deleted file:", change.FilePath)
+		default:
+			return fmt.Errorf("unknown operation: %s", change.Operation)
 		}
 	}
 	return nil

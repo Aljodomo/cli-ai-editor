@@ -42,6 +42,11 @@ func GetFileNamesInDirectory(rootDirectoryPath string) ([]string, error) {
 			return err
 		}
 
+		// Skip invisible files and directories
+		if filepath.Base(path)[0] == '.' {
+			return nil
+		}
+
 		// Skip directories themselves, we only want files
 		if !info.IsDir() {
 			// Convert absolute path to relative path from rootDirectoryPath

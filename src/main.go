@@ -1,5 +1,5 @@
 package main
 
 func main() {
-	RunMainDialogLoop(&TestRequestProcessor{}, &BasicFileChangeExecuter{})
+	RunMainDialogLoop(&ChatGptRequestProcessor{}, &BasicFileChangeExecuter{})
 }

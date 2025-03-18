@@ -9,8 +9,8 @@ type Operation string
 
 const (
 	EDIT   Operation = "Edit"
-	CREATE           = "Create"
-	DELETE           = "Delete"
+	CREATE Operation = "Create"
+	DELETE Operation = "Delete"
 )
 
 // FileChange represents a file operation with path
@@ -21,8 +21,7 @@ type FileChange struct {
 }
 
 type RequestProcessor interface {
-	ProcessRequest(request string) error
-	GetFileChanges() []FileChange
+	ProcessRequest(request string) ([]FileChange, error)
 }
 
 type FileChangeExecuter interface {
@@ -52,7 +51,7 @@ func RunMainDialogLoop(processor RequestProcessor, executer FileChangeExecuter) 
 	// Main interaction loop
 	for {
 		// Process request and propose changes
-		err := processor.ProcessRequest(request)
+		changes, err := processor.ProcessRequest(request)
 
 		if err != nil {
 			fmt.Println("Error processing request:", err)
@@ -60,14 +59,14 @@ func RunMainDialogLoop(processor RequestProcessor, executer FileChangeExecuter) 
 		}
 
 		// Display proposed changes
-		displayProposedChanges(processor.GetFileChanges())
+		displayProposedChanges(changes)
 
 		// Get confirmation
 		confirmation := RequestUserConfirmation("Is this okay?")
 
 		if confirmation == true {
 
-			err = executer.ExecuteFileChanges(processor.GetFileChanges())
+			err = executer.ExecuteFileChanges(changes)
 
 			if err != nil {
 				fmt.Println("Error executing changes:", err)

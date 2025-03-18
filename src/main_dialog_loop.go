@@ -8,9 +8,9 @@ import (
 type Operation string
 
 const (
-	EDIT   Operation = "Edit"
-	CREATE Operation = "Create"
-	DELETE Operation = "Delete"
+	EDIT   Operation = "EDIT"
+	CREATE Operation = "CREATE"
+	DELETE Operation = "DELETE"
 )
 
 // FileChange represents a file operation with path

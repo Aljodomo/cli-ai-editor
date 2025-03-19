@@ -15,9 +15,9 @@ const (
 
 // FileChange represents a file operation with path
 type FileChange struct {
-	Operation   Operation
-	FilePath    string
-	FileContent string
+	Operation   Operation `json:"operation"`
+	FilePath    string    `json:"relative_file_path"`
+	FileContent string    `json:"file_content"`
 }
 
 type RequestProcessor interface {

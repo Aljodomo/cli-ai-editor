@@ -1,11 +1,23 @@
 package main
 
 import (
+	_ "embed"
 	"encoding/json"
 	"fmt"
 	"os"
 	"slices"
 )
+
+//go:embed system-prompt.md
+var systemPrompt string
+
+type assistantResponse struct {
+	Type    string `json:"type"`
+	Payload string `json:"payload"`
+}
+
+type assistantReadPayload = []string
+type assistantWritePayload = []FileChange
 
 type ChatGptRequestProcessor struct {
 }
@@ -31,18 +43,7 @@ func (dp *ChatGptRequestProcessor) ProcessRequest(request string) ([]FileChange,
 		return nil, err
 	}
 
-	systemPrompt := "You are a editing software. There are those files in the current directory: \n"
-	for _, file := range files {
-		systemPrompt += file + "\n"
-	}
-	systemPrompt += "You can create or delete files.\n"
-	systemPrompt += "Only return a json list of objects with the format {operation: 'CREATE' | 'DELETE' | 'EDIT', relative_file_path: string, file_content: string} and NOTHING else.\n"
-	systemPrompt += "file_path can never start with a / because they represent relative paths.\n"
-	systemPrompt += "Example:\n"
-	systemPrompt += "[{\"operation\": \"CREATE\", \"file_path\": \"docs/new-file.txt\", \"file_content\": \"This is a new file\"}]"
-
 	response := AskChatGPT(systemPrompt, request)
-	fmt.Println("Response from ChatGPT:", response)
 
 	// Parse the response
 	changes, err = parseFileChanges(response, files)
@@ -53,6 +54,17 @@ func (dp *ChatGptRequestProcessor) ProcessRequest(request string) ([]FileChange,
 	}
 
 	return changes, nil
+}
+
+func parseAssistantResponse(response string) (*assistantResponse, error) {
+	var assistantResponse assistantResponse
+
+	err := json.Unmarshal([]byte(response), &assistantResponse)
+	if err != nil {
+		return nil, err
+	}
+
+	return &assistantResponse, nil
 }
 
 func parseFileChanges(response string, files []string) ([]FileChange, error) {
